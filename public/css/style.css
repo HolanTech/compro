@@ -1,0 +1,68 @@
+@media (max-width: 768px) {
+    .navbar-brand .logo-text {
+        display: none;
+    }
+
+    .navbar-brand {
+        justify-content: center;
+    }
+
+    .table {
+        font-size: 12px;
+    }
+}
+
+/* Mengatur tinggi slider */
+.carousel {
+    height: 700px;
+    /* margin-top: 50px; */
+    /* Sesuaikan dengan tinggi yang Anda inginkan */
+}
+
+/* Memberikan bayangan hitam pada teks */
+.carousel-item .container.text-center h3 {
+    text-shadow: 2px 2px 4px rgba(135, 133, 133, 0.5),
+        0 0 6px rgb(255, 255, 255);
+    font-weight: bold;
+}
+
+.carousel-item .container.text-center p {
+    text-shadow: 2px 2px 4px rgba(126, 125, 125, 0.5),
+        0 0 6px rgb(255, 255, 255);
+    font-weight: bold;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.kontak {
+    background: url("https://wallpaperaccess.com/full/1867010.jpg") no-repeat
+        center center;
+    background-size: cover;
+    padding-bottom: 20%;
+    padding-top: 20%;
+    color: #fff;
+}
+
+.card img {
+    max-width: 100%;
+    height: auto;
+}
+
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.animated-image img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.animated-image img:hover {
+    transform: scale(2);
+}
