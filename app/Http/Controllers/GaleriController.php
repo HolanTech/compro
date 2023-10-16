@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Galeri;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class GaleriController extends Controller
 {
-    // app/Http/Controllers/AdmingalerieController.php
-
     public function index()
     {
-        $galeri = Galeri::all(); // Ganti dengan model dan nama tabel yang sesuai
+        $galeri = Galeri::all();
         return view('admin.galeri.index', compact('galeri'));
     }
+
     public function create()
     {
         return view('admin.galeri.create');
@@ -24,7 +24,7 @@ class GaleriController extends Controller
     {
         $galeri = Galeri::find($id);
         if (!$galeri) {
-            return redirect()->route('admin.galeri.index')->with('error', 'galeri perusahaan tidak ditemukan.');
+            return redirect()->route('admin.galeri.index')->with('error', 'Galeri perusahaan tidak ditemukan.');
         }
 
         return view('admin.galeri.edit', compact('galeri'));
@@ -32,38 +32,28 @@ class GaleriController extends Controller
 
     public function store(Request $request)
     {
-        // // Debugging statement to check if the request reaches the store method
-        // dd('Reached store method');
-
         $validatedData = $request->validate([
-
             'caption' => 'required|string',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        // Check if the image file is valid
-        if (!$request->file('image')->isValid()) {
-            return redirect()->back()->withInput()->withErrors(['image' => 'Invalid image file.']);
-        }
+        $image = $request->file('image');
+        $imagePath =  time() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('images'), $imagePath);
 
-        // Generate a unique filename for the image
-        $imagePath = $request->file('image')->store('images', 'public');
-
-        // Create a new galeri instance and save it to the database
         $galeri = new Galeri();
         $galeri->caption = $request->caption;
         $galeri->image = $imagePath;
         $galeri->save();
 
-        return redirect()->route('galeri.index')->with('success', 'galeri perusahaan berhasil dibuat.');
+        return redirect()->route('galeri.index')->with('success', 'Galeri perusahaan berhasil dibuat.');
     }
-
 
     public function update(Request $request, $id)
     {
         $galeri = Galeri::find($id);
         if (!$galeri) {
-            return redirect()->route('galeri.index')->with('error', 'galeri perusahaan tidak ditemukan.');
+            return redirect()->route('galeri.index')->with('error', 'Galeri perusahaan tidak ditemukan.');
         }
 
         $validatedData = $request->validate([
@@ -72,30 +62,35 @@ class GaleriController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Generate a unique file title with timestamp
-            $imagePath = $request->file('image')->store('images', 'public');
-            Storage::disk('public')->delete($galeri->image); // Hapus image lama
+            $image = $request->file('image');
+            $imagePath = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images'), $imagePath);
+
+            // Hapus gambar lama jika ada
+            if (File::exists(public_path('images/' . $galeri->image))) {
+                File::delete(public_path('images/' . $galeri->image));
+            }
+
             $galeri->image = $imagePath;
         }
+
         $galeri->caption = $request->caption;
         $galeri->save();
 
-        return redirect()->route('galeri.index')->with('success', 'galeri perusahaan berhasil diperbarui.');
+        return redirect()->route('galeri.index')->with('success', 'Galeri perusahaan berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         $galeri = Galeri::find($id);
         if (!$galeri) {
-            return redirect()->route('galeri.index')->with('error', 'galeri perusahaan tidak ditemukan.');
+            return redirect()->route('galeri.index')->with('error', 'Galeri perusahaan tidak ditemukan.');
         }
 
-        // Hapus image dari penyimpanan
-        Storage::disk('public')->delete($galeri->image);
+        File::delete(public_path($galeri->image)); // Hapus gambar dari folder public/images
 
-        // Hapus data galeri perusahaan dari database
         $galeri->delete();
 
-        return redirect()->route('galeri.index')->with('success', 'galeri perusahaan berhasil dihapus.');
+        return redirect()->route('galeri.index')->with('success', 'Galeri perusahaan berhasil dihapus.');
     }
 }
